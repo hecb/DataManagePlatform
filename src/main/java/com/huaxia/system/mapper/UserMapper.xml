@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huaxia.system.mapper.UserMapper">
+<!-- 自定义返回结果集 -->
+   <resultMap id="userMap" type="com.huaxia.system.bean.User">
+		<id property="id" column="id" javaType="java.lang.Long"></id>
+		<result property="username" column="username" javaType="String"></result>
+		<result property="password" column="password" javaType="String"></result>
+	</resultMap>
+	
+	<resultMap id="userRoleMap" type="com.huaxia.system.bean.User"  extends="userMap">
+		<collection property="roles" ofType="com.huaxia.system.bean.Role">
+            <id column="roleId" property="id" javaType="java.lang.Long"/>
+            <result column="role_name" property="roleName"/>
+		</collection>
+	</resultMap>
+	
+	<resultMap id="userVoMap" type="com.huaxia.system.bean.User">
+		<id property="id" column="id" javaType="java.lang.Long"></id>
+		<result property="username" column="username" javaType="String"></result>
+		<result property="password" column="password" javaType="String"></result>
+		<collection property="roles" ofType="com.huaxia.system.bean.Role">
+            <id column="roleId" property="id" javaType="java.lang.Long"/>
+            <result column="role_name" property="roleName"/>
+            <collection property="perms" ofType="com.huaxia.system.bean.Permission">
+            	<id column="permId" property="id" javaType="java.lang.Long"/>
+            	<result property="name" column="name" javaType="String"></result>
+            	<result property="action" column="action" javaType="String"></result>
+            	<result property="module" column="module" javaType="String"></result>
+            	<result property="pid" column="pid" javaType="Long"></result>
+            	<result property="seq" column="seq" javaType="String"></result>
+            	<result property="type" column="type" javaType="String"></result>
+            </collection>
+        </collection>
+	</resultMap>
+    
+    <select id="selectUserVoById" resultMap="userVoMap" parameterType="Long">
+    	SELECT 
+    		u.id,
+    		u.username,
+    		u.password,
+    		r.id AS roleId,
+    		r.role_name,
+    		p.id AS permId,
+    		p.name,
+    		p.action,
+    		p.module,
+    		p.pid,
+    		p.seq,
+    		p.type
+    	FROM 
+    		t_user u 
+    	LEFT JOIN t_user_role ur ON u.id =ur.user_id
+    	LEFT JOIN t_role r ON ur.role_id =r.id
+    	LEFT JOIN t_role_permission rp on r.id = rp.role_id
+    	LEFT JOIN t_permission p on p.id = rp.perm_id
+ 		<where>
+ 			<if test=" id != null ">
+           		u.id = #{id}
+            </if>
+            <if test=" type != null and type != '' ">
+           		AND p.type = #{type}
+            </if>
+            <if test=" pid != null ">
+           		AND p.pid = #{pid}
+            </if>
+        </where> 
+        ORDER BY p.seq   		  
+    </select>
+    
+    <select id="findUserListPage" resultMap="userMap">
+    	SELECT 
+    		t.id,
+    		t.username,
+    		t.password
+    	FROM
+    		t_user t
+   		<where>
+    		1 = 1
+	    	<if test=" username != null and username != '' ">
+	        	AND	t.username LIKE CONCAT('%',#{username},'%' )
+	        </if>
+        </where>
+    	ORDER BY t.id DESC LIMIT #{start} , #{end}
+    </select>
+    
+    <select id="findUserCount" resultType="Long">
+    	SELECT 
+    		COUNT(t.id)
+    	FROM
+    		t_user t
+    	<where>
+    		1 = 1
+	    	<if test=" username != null and  username != '' ">
+	        	AND	t.username  LIKE CONCAT('%',#{username},'%' )
+	        </if>
+        </where>
+    </select>
+    
+    <select id="findUserRoles" resultMap="userRoleMap">
+    	SELECT 
+    		u.id,
+    		u.username,
+    		r.id AS roleId,
+    		r.role_name
+    	FROM 
+    		t_user u 
+    	LEFT JOIN 
+    		t_user_role ur on u.id = ur.user_id
+    	LEFT JOIN
+    		t_role r on ur.role_id = r.id
+    	<where>
+	    	<if test=" id != null ">
+	        	AND	u.id = #{id}
+	        </if>
+        </where>
+    	 
+    </select>
+    
+</mapper>	

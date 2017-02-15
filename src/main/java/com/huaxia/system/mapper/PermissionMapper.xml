@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huaxia.system.mapper.PermissionMapper">
+<!-- 自定义返回结果集 -->
+   <resultMap id="userMap" type="com.huaxia.system.bean.Permission">
+		<id property="id" column="id" javaType="java.lang.Long"></id>
+		<result property="name" column="username" javaType="java.lang.String"></result>
+		<result property="action" column="password" javaType="java.lang.String"></result>
+		<result property="module" column="username" javaType="java.lang.String"></result>
+		<result property="pid" column="password" javaType="java.lang.String"></result>
+		<result property="seq" column="password" javaType="java.lang.String"></result>
+		<result property="type" column="username" javaType="java.lang.String"></result>
+	</resultMap>
+	<select id="findPermList" resultMap="userMap" resultType="com.huaxia.system.bean.Permission">
+		SELECT 
+			id,
+			name,
+			action,
+			module,
+			pid,
+			seq,
+			type
+		FROM
+			t_permission
+			
+	</select>
+</mapper>	

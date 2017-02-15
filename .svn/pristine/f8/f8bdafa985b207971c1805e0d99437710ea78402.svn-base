@@ -1,0 +1,8 @@
+#--------- mysql -----------
+jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://172.30.50.13:3306/dataservice?useUnicode=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true&amp;useSSL=false
+jdbc.username=root
+jdbc.password=huaxia
+
+
+

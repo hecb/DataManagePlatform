@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huaxia.system.mapper.RoleMapper">
+	<resultMap id="roleMap" type="com.huaxia.system.bean.Role">
+		<id property="id" column="id" javaType="java.lang.Long"></id>
+		<result property="roleName" column="role_name" javaType="java.lang.String"></result>
+	</resultMap>
+	
+	<resultMap id="RolePermMap" type="com.huaxia.system.bean.Role"  extends="roleMap">
+		<collection property="perms" ofType="com.huaxia.system.bean.Permission">
+            	<id column="permId" property="id" javaType="java.lang.Long"/>
+            	<result property="name" column="name" javaType="String"></result>
+            	<result property="action" column="action" javaType="String"></result>
+            	<result property="module" column="module" javaType="String"></result>
+            	<result property="pid" column="pid" javaType="Long"></result>
+            	<result property="seq" column="seq" javaType="String"></result>
+            	<result property="type" column="type" javaType="String"></result>
+        </collection>
+	</resultMap>
+	
+	<select id="findRoleList" resultMap="roleMap">
+    	SELECT 
+    		t.id,
+    		t.role_name
+    	FROM
+    		t_role t
+    	ORDER BY t.id DESC
+    </select>
+	
+	<select id="findRoleCount" resultType="Long">
+    	SELECT 
+    		COUNT(t.id)
+    	FROM
+    		t_role t
+    </select>
+    
+    <select id="findRoleListPage" resultMap="roleMap">
+    	SELECT 
+    		t.id,
+    		t.role_name
+    	FROM
+    		t_role t
+    	ORDER BY t.id DESC LIMIT #{start} , #{end}
+    </select>
+    
+    
+    <select id="findRolePerms" resultMap="RolePermMap">
+    	SELECT 
+    		r.id,
+    		r.role_name,
+    		p.id AS permId,
+    		p.name,
+    		p.action,
+    		p.module,
+    		p.pid,
+    		p.seq,
+    		p.type
+    	FROM 
+    		t_role r 
+    	LEFT JOIN 
+    		t_role_permission rp on r.id = rp.role_id
+    	LEFT JOIN
+    		t_permission p on rp.perm_id = p.id
+    	<where>
+	    	<if test=" id != null ">
+	        	AND	r.id = #{id}
+	        </if>
+        </where>
+    	 
+    </select>
+	
+</mapper>

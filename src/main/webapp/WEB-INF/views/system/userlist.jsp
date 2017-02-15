@@ -1,0 +1,178 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ include file="/commons/global.jsp" %>
+
+<html>
+<head>
+<title>角色管理</title>
+<%@ include file="/commons/basejs.jsp" %>
+
+    <script type="text/javascript">
+    
+    function getUrl(){
+    	var username= $("#username").val();
+    	var url=basePath+"/user/userlist?username="+username;
+       
+        return url;
+    }
+    
+    function search(){
+    	pageQuery();
+    }
+    
+    function pageQuery(){
+        $("#sample-table").dataTable({
+            "bFilter": false,//去掉搜索框
+            "sErrMode" : "throw", //错误信息显示方式
+            "bDeferRender" : true, //启用延迟加载
+            "bInfo" : true, //显示表格相关信息，如翻页信息
+            "iDisplayLength" : 10, //默认的每页条数
+            "aLengthMenu" : [10,20,50], //更改显示记录数选项 
+            "bLengthChange": true, //用户可改变每页条数
+            "bAutoWidth": false, //是否自适应宽度
+            "bSort" : false, //不在前端排序
+            "bPaginate": true, //翻页功能
+            "sPaginationType" : "full_numbers",  //设置分页方式
+            "bStateSave": false, //不保存到cookie
+            //"sAjaxDataProp" : "aData",
+            "bDestroy" : true,
+            "bProcessing" : true, //显示加载时的进度条
+            "sAjaxSource" : getUrl(),  //数据源url
+            "bServerSide" : true,
+            "aoColumns" : [ {    //数据
+                "mData" : "id"
+            }, {
+            	"mData" : null
+            }, {
+            	"mData" : "username"
+            }, {
+            	"mData" : "password"
+            }],
+            "aoColumnDefs" : [
+            	{
+            		"bVisible": false,
+                    "aTargets": [0]
+                },{
+                	"aTargets": [1],
+                	//"sDefaultContent":"<a href='#' id='config' class='red' onclick=configRole()><i class='icon-cogs bigger-130'></i></a>",
+                 	"mRender": function(data,type,row,meta) { 
+                    	  return   "<input type='checkbox' name='id' value='"+ row.id+"' />";
+                    }
+                }
+ 
+            ],
+            "oLanguage" : {
+                "sProcessing" : "正在加载中......",
+                "sLengthMenu" : "每页显示 _MENU_ 条记录",
+                "sZeroRecords" : "没有数据！",
+                "sEmptyTable" : "对不起，未查到符合条件的记录！",
+                "sInfo" : "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
+                "sInfoEmpty" : "显示0到0条记录",
+                "sInfoFiltered" : "数据表中共为 _MAX_ 条记录",
+                "oPaginate" : {
+                    "sFirst" : "首页",
+                    "sPrevious" : "上一页",
+                    "sNext" : "下一页",
+                    "sLast" : "末页"
+                }
+            }
+        });
+    }
+     
+    
+
+    function configRole() {
+    	var chk_value =[];    
+   	 	$('input[name="id"]:checked').each(function(){    
+   	  		chk_value.push($(this).val());    
+   	  	});    
+   	 	//alert(chk_value.length);
+   	 	
+	   /* 	$.each(chk_value,function(index,value){
+	   	     alert(index+"..."+value);
+	   	}); */
+   	  	if(chk_value.length != 1){
+   	  		layer.alert("请选择一个需要配置角色的用户！");
+   	  		return;
+   	 	}   
+		layer.open({
+			title : [ '配置角色' ],
+			type : 2,
+			area : [ '700px', '530px' ],
+			fixed : false, //不固定
+			maxmin : true,
+			btn : [ '确定', '取消' ],
+			content : encodeURI(encodeURI(basePath + "/user/showUserRoleView?id="
+					+ chk_value[0])),
+			yes : function(index, layero) {
+				$(layero).find("iframe")[0].contentWindow.subForm();
+			},
+			end : function() {
+				location.reload();
+			}
+		});
+    } 
+    
+    $(function(){ 
+    	search();
+    })
+    </script>
+ </head>
+<body>
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home home-icon"></i>
+                    <a href="#">主页</a>
+                </li>
+                <li>
+                    	用户管理
+                </li>
+            </ul><!-- .breadcrumb -->
+        </div>
+        <div class="page-content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="table-responsive">
+                        <div  id="form">
+                            <table>
+                                <tr>
+                                    <td style="height:10px"></td>
+                                </tr>
+                                <tr>
+                                    <td>用户名称:</td>
+                                    <td> 
+                                        <input type="text" name="username" id="username"/>
+                                    </td>
+                                    
+                                    <td>&nbsp;&nbsp;</td>
+                                    
+                                    <td><button class="btn btn-sm btn-light" onclick="search()"  title="查询">查&nbsp;&nbsp;询</button></td>
+                                </tr>
+                            </table>
+                            <p/><p/>
+                             <div class="table-header">
+								<a href='#' id='config' class='red' onclick="configRole()"><i class='icon-cogs bigger-130'>配置角色</i></a>
+							 </div>
+                             <table  id="sample-table" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                   		<th class="center">ID</th>
+                                   		<th class="center">
+                                   		<input type="checkbox"  />
+										</th>
+                                        <th class="center">用户名称</th>
+                                        <th class="center">密码</th>
+                                    </tr>
+                                </thead>
+    
+                                <tbody id="list" class="center">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.page-content -->
+</body>
+
+</html>
